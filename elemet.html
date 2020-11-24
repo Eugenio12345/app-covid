@@ -1,0 +1,90 @@
+import { Component, OnInit } from '@angular/core';
+import { Product } from 'src/app/models/product/product';
+import { ProductService } from 'src/app/services/product-service/product.service';
+import { FormGroup, FormBuilder } from '@angular/forms';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+
+
+@Component({
+  selector: 'app-product-list',
+  templateUrl: './product-list.component.html',
+  styleUrls: ['./product-list.component.scss']
+})
+export class ProductListComponent implements OnInit {
+  
+  products: Product[];
+  producto: Product;
+  nombreApp: String;
+  formProductUpdate: FormGroup;
+  sku: String;
+  name: String;
+  price: number;
+  image: String;
+  stock: number;
+  id: string;
+  
+  constructor( private productService:ProductService,  private modalService: NgbModal, private patterBuilder: FormBuilder) {
+    this.formProductUpdate =  this.patterBuilder.group({
+      sku:'',
+      name:'',
+      price:'',
+      stock:'',
+      image:''
+    })
+  
+   
+   }
+
+   
+   eliminar(id){
+    console.log('eliminando ---' +id);
+     if(confirm('Seguro que desea eliminar')){
+
+       this.productService.deleteProduct(id)
+       
+     }
+ }
+
+
+  ngOnInit(): void {
+    console.log('Loading controller')
+    this.productService.getProduct().snapshotChanges().subscribe((data: any)=>{
+      this.products = data.map(e=>{
+          
+          return {
+           id: e.payload.key,  
+           ...e.payload.val()  
+          } as Product;
+      });
+      console.log(this.products)
+    });
+    
+  }
+   
+  updateProduct(product){
+    product.id = this.id;
+    product.sku =  product.sku == '' ? this.sku : product.sku;
+    product.name = product.name == '' ? this.name: product.name;
+    product.stock = product.stock == '' ? this.stock : product.stock;
+    product.price = product.price == '' ? this.price : product.price;
+    product.image = product.image == '' ? this.image : product.image;
+    this.productService.updateProduct(product);
+    this.ngOnInit();
+  
+    
+  }
+
+  openWindowCustomClass(content, id) {
+    this.id = id;
+    this.productService.getByID(id).valueChanges().subscribe(s=>{
+      this.producto = s;
+      this.sku = this.producto.name;
+      this.name = this.producto.name;
+      this.stock = this.producto.stock;
+      this.price = this.producto.price;
+      this.image = this.producto.image;      
+    });
+    this.modalService.open(content, { windowClass: 'dark-modal' });
+  }
+
+}
