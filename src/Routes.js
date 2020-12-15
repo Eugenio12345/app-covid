@@ -14,7 +14,7 @@ const Routes = () => (
     
        <Route exact path = "/grafica" component = {ConteoGrafica}/> 
        <Route exact path = "/home" component = {Home}/>
-       <Route exact path = "/general" component = {InfoGeneral}/>  
+       <Route exact path = "/" component = {InfoGeneral}/>  
        <Route exact path = "/porPais" component = {GrafCountry}/>  
 
 
